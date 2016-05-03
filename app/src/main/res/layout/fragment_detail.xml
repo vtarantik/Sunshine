@@ -1,14 +1,96 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:showIn="@layout/activity_detail"
-    tools:context="com.tarantik.vaclav.sunshine.fragment.DetailFragment">
+    tools:context="com.tarantik.vaclav.sunshine.fragment.DetailFragment"
+    tools:showIn="@layout/activity_detail">
 
     <TextView
-        android:id="@+id/textview_detail"
+        android:id="@+id/textview_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TODAY" />
+
+    <TextView
+        android:id="@+id/textview_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="JUNE 24" />
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textview_temp_high"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="21" />
+
+            <TextView
+                android:id="@+id/textview_temp_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imageview_weather_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/common_ic_googleplayservices" />
+
+            <TextView
+                android:id="@+id/textview_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CLEAR" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textview_humidity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="HUMIDITY: " />
+
+    <TextView
+        android:id="@+id/textview_wind"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WIND: " />
+
+    <TextView
+        android:id="@+id/textview_pressure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="PRESSURE: " />
 
 </LinearLayout>
+
+</ScrollView>

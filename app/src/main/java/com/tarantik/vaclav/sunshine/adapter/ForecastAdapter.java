@@ -18,8 +18,24 @@ import com.tarantik.vaclav.sunshine.helper.Utility;
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
 public class ForecastAdapter extends CursorAdapter {
+    private final int VIEW_TYPE_TODAY = 0;
+    private final int VIEW_TYPE_FUTURE_DAY = 1;
+
+    private Context context;
+
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
+        this.context = context;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return (position==0)?VIEW_TYPE_TODAY:VIEW_TYPE_FUTURE_DAY;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+        return 2;
     }
 
     /**
@@ -27,7 +43,7 @@ public class ForecastAdapter extends CursorAdapter {
      */
     private String formatHighLows(double high, double low) {
         boolean isMetric = Utility.isMetric(mContext);
-        String highLowStr = Utility.formatTemperature(high, isMetric) + "/" + Utility.formatTemperature(low, isMetric);
+        String highLowStr = Utility.formatTemperature(context,high, isMetric) + "/" + Utility.formatTemperature(context,low, isMetric);
         return highLowStr;
     }
 
@@ -50,43 +66,64 @@ public class ForecastAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_forecast, parent, false);
+        // Choose the layout type
+        int viewType = getItemViewType(cursor.getPosition());
+        int layoutId = (viewType==VIEW_TYPE_TODAY)?R.layout.list_item_forecast_today:R.layout.list_item_forecast;
+        View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
+
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
 
         return view;
     }
 
     /*
+
         This is where we fill-in the views with the contents of the cursor.
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        // Read weather icon ID from cursor
-        int weatherId = cursor.getInt(ForecastFragment.COL_WEATHER_ID);
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+
         // Use placeholder image for now
-        ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
-        iconView.setImageResource(R.drawable.common_google_signin_btn_icon_dark_disabled);
+        viewHolder.iconView.setImageResource(R.drawable.common_google_signin_btn_icon_dark_disabled);
 
         //Forecast
         String forecast = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
-        TextView forecastTextView = (TextView)view.findViewById(R.id.list_item_forecast_textview);
-        forecastTextView.setText(forecast);
+        viewHolder.descriptionView.setText(forecast);
 
         //Date
         long dateInMillis = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
-        TextView dateTextView = (TextView)view.findViewById(R.id.list_item_date_textview);
-        dateTextView.setText(Utility.getFriendlyDayString(context,dateInMillis));
+        viewHolder.dateView.setText(Utility.getFriendlyDayString(context,dateInMillis));
 
         // Read user preference for metric or imperial temperature units
         boolean isMetric = Utility.isMetric(context);
 
         //High temp
         float highTemp = cursor.getFloat(ForecastFragment.COL_WEATHER_MAX_TEMP);
-        TextView highTempTextView = (TextView)view.findViewById(R.id.list_item_high_textview);
-        highTempTextView.setText(Utility.formatTemperature(highTemp,isMetric));
+        viewHolder.highTempView.setText(Utility.formatTemperature(context,highTemp,isMetric));
 
         //Low temp
         float lowTemp = cursor.getFloat(ForecastFragment.COL_WEATHER_MIN_TEMP);
-        TextView lowTempTextView = (TextView)view.findViewById(R.id.list_item_low_textview);
-        lowTempTextView.setText(Utility.formatTemperature(lowTemp,isMetric));
+        viewHolder.lowTempView.setText(Utility.formatTemperature(context,lowTemp,isMetric));
+    }
+
+    /*
+    View holder for layout views
+     */
+    public static class ViewHolder {
+        public final ImageView iconView;
+        public final TextView dateView;
+        public final TextView descriptionView;
+        public final TextView highTempView;
+        public final TextView lowTempView;
+
+        public ViewHolder(View view) {
+            iconView = (ImageView)view.findViewById(R.id.list_item_icon);
+            dateView = (TextView) view.findViewById(R.id.list_item_date_textview);
+            descriptionView = (TextView) view.findViewById(R.id.list_item_forecast_textview);
+            highTempView = (TextView) view.findViewById(R.id.list_item_high_textview);
+            lowTempView = (TextView) view.findViewById(R.id.list_item_low_textview);
+        }
     }
 }
