@@ -163,7 +163,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
         int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
-        imageViewIcon.setImageResource(R.drawable.common_google_signin_btn_icon_light_focused);
+        imageViewIcon.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
 
         long dateInMillis = data.getLong(COL_WEATHER_DATE);
         boolean isMetric = Utility.isMetric(getActivity());

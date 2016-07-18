@@ -85,8 +85,14 @@ public class ForecastAdapter extends CursorAdapter {
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
 
-        // Use placeholder image for now
-        viewHolder.iconView.setImageResource(R.drawable.common_google_signin_btn_icon_dark_disabled);
+        int viewType = getItemViewType(cursor.getPosition());
+        int res;
+        if(viewType==VIEW_TYPE_TODAY){
+            res = Utility.getArtResourceForWeatherCondition(cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID));
+        }else{
+            res = Utility.getIconResourceForWeatherCondition(cursor.getInt(ForecastFragment.COL_WEATHER_CONDITION_ID));
+        }
+        viewHolder.iconView.setImageResource(res);
 
         //Forecast
         String forecast = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
