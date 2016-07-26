@@ -148,7 +148,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Intent detailsIntent = getActivity().getIntent();
         mDetailUriText = detailsIntent.getStringExtra("weather_data");
-        if (detailsIntent != null) {
+        if (detailsIntent == null) {
             return null;
         }
         return new CursorLoader(getActivity(), detailsIntent.getData(), DETAIL_COLUMNS, null, null, null);
@@ -159,35 +159,36 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(TAG, "In onLoadFinished");
         if (!data.moveToFirst()) {
+            Log.d(TAG,"No data, returning");
             return;
         }
 
-        int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
+        int weatherId = data.getInt(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WEATHER_ID));
         imageViewIcon.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
 
-        long dateInMillis = data.getLong(COL_WEATHER_DATE);
+        long dateInMillis = data.getLong(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE));
         boolean isMetric = Utility.isMetric(getActivity());
 
 
         textViewDay.setText(Utility.getFriendlyDayString(getActivity(), dateInMillis));
         textViewDate.setText(Utility.getFormattedMonthDay(getActivity(), dateInMillis));
 
-        textViewDescription.setText(data.getString(COL_WEATHER_DESC));
+        textViewDescription.setText(data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC)));
 
-        textViewTempHigh.setText(Utility.formatTemperature(getActivity(), data.getDouble(COL_WEATHER_MAX_TEMP), isMetric));
-        textViewTempLow.setText(Utility.formatTemperature(getActivity(), data.getDouble(COL_WEATHER_MIN_TEMP), isMetric));
+        textViewTempHigh.setText(Utility.formatTemperature(getActivity(), data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP)), isMetric));
+        textViewTempLow.setText(Utility.formatTemperature(getActivity(), data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP)), isMetric));
 
-        textViewWind.setText(Utility.getFormattedWind(getActivity(), data.getFloat(COL_WEATHER_WIND_SPEED), data.getFloat(COL_WEATHER_DEGREES)));
+        textViewWind.setText(Utility.getFormattedWind(getActivity(), data.getFloat(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_WIND_SPEED)), data.getFloat(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DEGREES))));
 
-        float humidity = data.getFloat(COL_WEATHER_HUMIDITY);
+        float humidity = data.getFloat(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_HUMIDITY));
         textViewHumidity.setText(getActivity().getString(R.string.format_humidity, humidity));
 
         // Read pressure from cursor and update view
-        float pressure = data.getFloat(COL_WEATHER_PRESSURE);
+        float pressure = data.getFloat(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_PRESSURE));
         textViewPressure.setText(getActivity().getString(R.string.format_pressure, pressure));
 
         // We still need this for the share intent
-        forecast = String.format("%s - %s - %s/%s", Utility.getFormattedMonthDay(getActivity(), data.getLong(COL_WEATHER_DATE)), data.getString(COL_WEATHER_DESC), data.getDouble(COL_WEATHER_MAX_TEMP), data.getDouble(COL_WEATHER_MIN_TEMP));
+        forecast = String.format("%s - %s - %s/%s", Utility.getFormattedMonthDay(getActivity(), data.getLong(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_DATE))), data.getString(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_SHORT_DESC)), data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MAX_TEMP)), data.getDouble(data.getColumnIndex(WeatherContract.WeatherEntry.COLUMN_MIN_TEMP)));
 
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActionProvider != null) {
