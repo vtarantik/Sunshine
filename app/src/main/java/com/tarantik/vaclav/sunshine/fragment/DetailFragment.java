@@ -147,10 +147,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         Intent detailsIntent = getActivity().getIntent();
-        mDetailUriText = detailsIntent.getStringExtra("weather_data");
-        if (detailsIntent == null) {
+        if (detailsIntent == null|| detailsIntent.getData()==null) {
             return null;
         }
+        mDetailUriText = detailsIntent.getStringExtra("weather_data");
         return new CursorLoader(getActivity(), detailsIntent.getData(), DETAIL_COLUMNS, null, null, null);
 
     }

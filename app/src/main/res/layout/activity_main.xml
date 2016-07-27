@@ -21,12 +21,12 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/container"
+    <fragment
+        android:id="@+id/fragment_forecast"
+        android:name="com.tarantik.vaclav.sunshine.fragment.ForecastFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity"
-        tools:ignore="MergeRootFrame"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        tools:layout = "@android:layout/list_content"/>
+
 
 </android.support.design.widget.CoordinatorLayout>

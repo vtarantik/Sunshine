@@ -12,12 +12,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.tarantik.vaclav.sunshine.R;
+import com.tarantik.vaclav.sunshine.fragment.DetailFragment;
 import com.tarantik.vaclav.sunshine.fragment.ForecastFragment;
 import com.tarantik.vaclav.sunshine.helper.Utility;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String FORECASTFRAGMENT_TAG = ForecastFragment.class.getSimpleName();
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
+    private boolean twoPane;
 
     private String mLocation;
 
@@ -26,16 +29,19 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment(), FORECASTFRAGMENT_TAG)
-                    .commit();
+
+        if (findViewById(R.id.weather_detail_container) != null) {
+            twoPane = true;
+            if(savedInstanceState== null){
+                getSupportFragmentManager().beginTransaction().
+                        replace(R.id.weather_detail_container,new DetailFragment())
+                        .commit();
+            }else{
+                twoPane = false;
+            }
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        mLocation = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
+        mLocation = Utility.getPreferredLocation(this);
 
     }
 
@@ -50,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onResume");
         super.onResume();
         if(mLocation.equals(Utility.getPreferredLocation(this))){
-            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentByTag(FORECASTFRAGMENT_TAG);
+            ForecastFragment ff = (ForecastFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
             ff.onLocationChanged();
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             mLocation = sharedPreferences.getString(getString(R.string.pref_location_key), getString(R.string.pref_location_default));
