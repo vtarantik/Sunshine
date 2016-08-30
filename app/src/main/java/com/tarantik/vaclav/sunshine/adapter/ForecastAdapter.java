@@ -22,6 +22,7 @@ public class ForecastAdapter extends CursorAdapter {
     private final int VIEW_TYPE_FUTURE_DAY = 1;
 
     private Context context;
+    private boolean useTodayLayout;
 
     public ForecastAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
@@ -30,7 +31,14 @@ public class ForecastAdapter extends CursorAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        return (position==0)?VIEW_TYPE_TODAY:VIEW_TYPE_FUTURE_DAY;
+        if(position == 0){
+            if(useTodayLayout){
+                return VIEW_TYPE_TODAY;
+            }else{
+                return VIEW_TYPE_FUTURE_DAY;
+            }
+        }
+        return VIEW_TYPE_FUTURE_DAY;
     }
 
     @Override
@@ -68,6 +76,7 @@ public class ForecastAdapter extends CursorAdapter {
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         // Choose the layout type
         int viewType = getItemViewType(cursor.getPosition());
+
         int layoutId = (viewType==VIEW_TYPE_TODAY)?R.layout.list_item_forecast_today:R.layout.list_item_forecast;
         View view = LayoutInflater.from(context).inflate(layoutId, parent, false);
 
@@ -112,6 +121,10 @@ public class ForecastAdapter extends CursorAdapter {
         //Low temp
         float lowTemp = cursor.getFloat(ForecastFragment.COL_WEATHER_MIN_TEMP);
         viewHolder.lowTempView.setText(Utility.formatTemperature(context,lowTemp,isMetric));
+    }
+    
+    public void setUseTodayLayout(boolean useTodayLayout){
+        this.useTodayLayout = useTodayLayout;
     }
 
     /*

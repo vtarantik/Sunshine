@@ -2,6 +2,7 @@ package com.tarantik.vaclav.sunshine.fragment;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -29,6 +30,7 @@ import com.tarantik.vaclav.sunshine.helper.Utility;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private static final String TAG = DetailFragment.class.getSimpleName();
     private static final int DETAIL_LOADER_ID = 0;
+    public static final String DETAIL_URI = "URI";
 
     private static final String[] DETAIL_COLUMNS = {
             // In this case the id needs to be fully qualified with a table name, since
@@ -79,8 +81,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private TextView textViewPressure;
 
     private String forecast;
+    private Uri mUri;
 
     public DetailFragment() {
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -91,6 +95,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
+        }
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         textViewDay = (TextView) rootView.findViewById(R.id.textview_day);
         textViewDate = (TextView) rootView.findViewById(R.id.textview_date);
@@ -102,7 +111,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         textViewWind = (TextView) rootView.findViewById(R.id.textview_wind);
         textViewPressure = (TextView) rootView.findViewById(R.id.textview_pressure);
 
-        setHasOptionsMenu(true);
         return rootView;
     }
 
@@ -146,20 +154,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent detailsIntent = getActivity().getIntent();
-        if (detailsIntent == null|| detailsIntent.getData()==null) {
-            return null;
-        }
-        mDetailUriText = detailsIntent.getStringExtra("weather_data");
-        return new CursorLoader(getActivity(), detailsIntent.getData(), DETAIL_COLUMNS, null, null, null);
+        if (null != mUri) {
+            return new CursorLoader(getActivity(), mUri, DETAIL_COLUMNS, null, null, null);
 
+        }
+        return null;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.v(TAG, "In onLoadFinished");
         if (!data.moveToFirst()) {
-            Log.d(TAG,"No data, returning");
+            Log.d(TAG, "No data, returning");
             return;
         }
 
@@ -193,6 +199,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         // If onCreateOptionsMenu has already happened, we need to update the share intent now.
         if (mShareActionProvider != null) {
             mShareActionProvider.setShareIntent(createShareForecastIntent());
+        }
+    }
+
+    public void onLocationChanged(String newLocation) {
+        // replace the uri, since the location has changed
+        Uri uri = mUri;
+        if (null != uri) {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+            Uri updatedUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            mUri = updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER_ID, null, this);
         }
     }
 
