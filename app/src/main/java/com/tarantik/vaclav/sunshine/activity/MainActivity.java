@@ -34,14 +34,15 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
                 getSupportFragmentManager().beginTransaction().
                         replace(R.id.weather_detail_container,new DetailFragment())
                         .commit();
-            }else{
-                Log.d(TAG,"One pane");
-                twoPane = false;
-                getSupportActionBar().setElevation(0);
             }
-            ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
-            forecastFragment.setUseTodayLayout(!twoPane);
+
+        }else{
+            Log.d(TAG,"One pane");
+            twoPane = false;
+            getSupportActionBar().setElevation(0);
         }
+        ForecastFragment forecastFragment = (ForecastFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_forecast);
+        forecastFragment.setUseTodayLayout(!twoPane);
 
         mLocation = Utility.getPreferredLocation(this);
 
